@@ -1,0 +1,63 @@
+{% extends 'crm/base.html' %}
+
+{% block header_title %}Lead Details{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <!-- Header Section -->
+        <div
+            class="px-6 py-5 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gray-50">
+            <div>
+                <h3 class="text-2xl font-bold text-gray-900">{{ lead.first_name }} {{ lead.last_name }}</h3>
+                <p class="text-sm text-gray-500 mt-1">
+                    <i class="fas fa-envelope mr-1"></i> {{ lead.email }}
+                    {% if lead.phone %}<span class="mx-2">|</span><i class="fas fa-phone mr-1"></i> {{ lead.phone }}{%
+                    endif %}
+                </p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'lead-update' lead.pk %}"
+                    class="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm">
+                    <i class="fas fa-edit mr-1"></i> Edit
+                </a>
+                <a href="{% url 'lead-delete' lead.pk %}"
+                    class="px-3 py-1.5 bg-red-50 text-red-700 border border-red-100 rounded-md text-sm font-medium hover:bg-red-100 transition-colors">
+                    <i class="fas fa-trash-alt mr-1"></i> Delete
+                </a>
+            </div>
+        </div>
+
+        <!-- Info Grid -->
+        <div class="p-6">
+            <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
+                <div class="sm:col-span-1">
+                    <dt class="text-sm font-medium text-gray-500">Status</dt>
+                    <dd class="mt-1 text-sm text-gray-900 capitalize">{{ lead.get_status_display }}</dd>
+                </div>
+                <div class="sm:col-span-1">
+                    <dt class="text-sm font-medium text-gray-500">Source</dt>
+                    <dd class="mt-1 text-sm text-gray-900 capitalize">{{ lead.get_source_display }}</dd>
+                </div>
+                <div class="sm:col-span-1">
+                    <dt class="text-sm font-medium text-gray-500">Assigned Agent</dt>
+                    <dd class="mt-1 text-sm text-gray-900">
+                        {% if lead.assigned_to %}{{ lead.assigned_to.username }}{% else %}<span
+                            class="text-gray-400 italic">Unassigned</span>{% endif %}
+                    </dd>
+                </div>
+                <div class="sm:col-span-1">
+                    <dt class="text-sm font-medium text-gray-500">Created At</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ lead.created_at|date:"M d, Y" }}</dd>
+                </div>
+            </dl>
+        </div>
+
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-100">
+            <a href="{% url 'lead-list' %}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                <i class="fas fa-arrow-left mr-1"></i> Back to Leads
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

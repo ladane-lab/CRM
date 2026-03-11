@@ -1,0 +1,137 @@
+{% extends 'crm/base.html' %}
+
+{% block header_title %}
+Welcome back, {{ user.username }}
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Stat Card 1 -->
+        <div
+            class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex items-center hover:shadow-md transition-shadow">
+            <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                <i class="fas fa-users text-xl"></i>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Total Contacts</p>
+                <p class="text-2xl font-bold text-gray-900">{{ total_contacts }}</p>
+            </div>
+        </div>
+
+        <!-- Stat Card 2 -->
+        <div
+            class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex items-center hover:shadow-md transition-shadow">
+            <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
+                <i class="fas fa-bullseye text-xl"></i>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Active Leads</p>
+                <p class="text-2xl font-bold text-gray-900">{{ active_leads }}</p>
+            </div>
+        </div>
+
+        <!-- Stat Card 3 -->
+        <div
+            class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex items-center hover:shadow-md transition-shadow">
+            <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                <i class="fas fa-chart-line text-xl"></i>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Opportunities Won</p>
+                <p class="text-2xl font-bold text-gray-900">{{ opportunities_won }}</p>
+            </div>
+        </div>
+
+        <!-- Stat Card 4 -->
+        <div
+            class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex items-center hover:shadow-md transition-shadow">
+            <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
+                <i class="fas fa-dollar-sign text-xl py-0.5 px-1.5"></i>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Won Revenue</p>
+                <p class="text-2xl font-bold text-gray-900">${{ revenue_pipeline }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Pipeline by Stage</h3>
+            <div class="relative h-64 w-full">
+                <canvas id="pipelineChart"></canvas>
+            </div>
+        </div>
+
+        <div
+            class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex flex-col items-center justify-center text-center">
+            <div class="w-16 h-16 bg-indigo-50 text-indigo-500 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-rocket text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Ready to Grow</h3>
+            <p class="text-sm text-gray-500 max-w-sm mb-6">Your CRM is set up and configured. Start adding tasks and
+                logging activities to close more deals.</p>
+            <a href="{% url 'opportunity-create' %}"
+                class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm">
+                Add New Opportunity
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column: Recent Activity -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-gray-800">Recent Leads</h3>
+                    <a href="#" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">View all</a>
+                </div>
+                <div class="p-6 text-center text-gray-500">
+                    <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
+                    <p>No recent leads to display.</p>
+                    <button
+                        class="mt-4 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg text-sm font-medium hover:bg-indigo-100 transition-colors">
+                        Add New Lead
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Quick Actions -->
+        <div>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+                <div class="px-6 py-4 border-b border-gray-100">
+                    <h3 class="text-lg font-semibold text-gray-800">Quick Actions</h3>
+                </div>
+                <div class="p-4 space-y-3">
+                    <button
+                        class="w-full flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors text-left">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-indigo-100 text-indigo-600 p-2 rounded-lg">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <span class="font-medium text-gray-700">Add Contact</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+                    </button>
+
+                    <button
+                        class="w-full flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors text-left">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-green-100 text-green-600 p-2 rounded-lg">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <span class="font-medium text-gray-700">New Opportunity</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
