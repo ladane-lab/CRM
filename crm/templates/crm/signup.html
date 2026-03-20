@@ -1,68 +1,141 @@
 {% extends 'crm/base.html' %}
 
 {% block auth_content %}
-<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-xl border border-gray-100">
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-2xl border border-gray-100 flex flex-col">
         <div>
-            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900 border-b pb-4">
-                <i class="fas fa-user-plus text-indigo-600 mr-2"></i> Join CRM Pro
+            <div class="flex justify-center mb-4">
+                <div class="h-20 w-20 bg-indigo-100 rounded-full flex items-center justify-center shadow-inner">
+                    <i class="fas fa-user-plus text-3xl text-indigo-600"></i>
+                </div>
+            </div>
+            <h2 class="text-center text-3xl font-extrabold text-gray-900 tracking-tight">
+                Join CRM Pro
             </h2>
-            <h3 class="mt-2 text-center text-xl text-gray-600">
-                Create your account
-            </h3>
+            <p class="mt-2 text-center text-sm text-gray-500">
+                Start managing your pipeline more effectively today.
+            </p>
         </div>
-        <form class="mt-8 space-y-6" action="{% url 'signup' %}" method="POST">
+        
+        <form class="mt-6 space-y-5" action="{% url 'signup' %}" method="POST">
             {% csrf_token %}
+            
             <div class="space-y-4">
                 {% for field in form %}
-                <div>
-                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                <div class="relative">
+                    <label for="{{ field.id_for_label }}" class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-1.5 ml-1">
                         {{ field.label }}
                     </label>
-                    {{ field }}
-                    {% if field.help_text %}
-                    <p class="text-xs text-gray-500 mt-1">{{ field.help_text|safe }}</p>
-                    {% endif %}
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-10">
+                            {% if 'username' in field.name %}
+                                <i class="far fa-user text-gray-400 group-focus-within:text-indigo-500 transition-colors"></i>
+                            {% elif 'email' in field.name %}
+                                <i class="far fa-envelope text-gray-400 group-focus-within:text-indigo-500 transition-colors"></i>
+                            {% elif 'password' in field.name %}
+                                <i class="fas fa-fingerprint text-gray-400 group-focus-within:text-indigo-500 transition-colors"></i>
+                            {% elif 'role' in field.name %}
+                                <i class="fas fa-user-tag text-gray-400 group-focus-within:text-indigo-500 transition-colors"></i>
+                            {% else %}
+                                <i class="fas fa-edit text-gray-400 group-focus-within:text-indigo-500 transition-colors"></i>
+                            {% endif %}
+                        </div>
+                        {{ field }}
+                    </div>
                     {% for error in field.errors %}
-                    <p class="text-sm text-red-600 mt-1">{{ error }}</p>
+                        <p class="text-xs text-red-500 mt-1 ml-1 font-medium flex items-center gap-1">
+                            <i class="fas fa-circle-exclamation text-[10px]"></i> {{ error }}
+                        </p>
                     {% endfor %}
+                    {% if 'password' in field.name %}
+                        <div class="password-help-container mt-1.5 ml-1">
+                            <button type="button" onclick="this.nextElementSibling.classList.toggle('hidden')" class="text-[10px] text-indigo-500 hover:text-indigo-600 font-semibold focus:outline-none">
+                                <i class="fas fa-info-circle mr-1"></i> Password requirements
+                            </button>
+                            <div class="hidden mt-2 p-3 bg-indigo-50/50 rounded-lg border border-indigo-100/50 text-[10px] text-gray-500 leading-relaxed shadow-sm">
+                                {{ field.help_text|safe }}
+                            </div>
+                        </div>
+                    {% elif field.help_text and not field.errors %}
+                        <p class="text-[10px] text-gray-400 mt-1.5 ml-1 leading-tight">{{ field.help_text|safe }}</p>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
 
             {% if form.non_field_errors %}
-            <div class="text-red-500 text-sm p-3 bg-red-50 rounded-md">
-                {% for error in form.non_field_errors %}
-                {{ error }}
-                {% endfor %}
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-triangle text-red-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-red-700">
+                            {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                        </p>
+                    </div>
+                </div>
             </div>
             {% endif %}
 
-            <div>
+            <div class="pt-2">
                 <button type="submit"
-                    class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors shadow-md">
+                    class="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg active:scale-95">
                     <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-                        <i class="fas fa-check text-indigo-500 group-hover:text-indigo-400"></i>
+                        <i class="fas fa-arrow-right text-indigo-300 group-hover:text-white transition-colors"></i>
                     </span>
-                    Sign Up
+                    Create My Account
                 </button>
             </div>
 
-            <div class="text-sm text-center mt-4 text-gray-600">
-                Already have an account? <a href="{% url 'login' %}"
-                    class="font-medium text-indigo-600 hover:text-indigo-500 transition-colors">Sign in</a>
+            <div class="text-sm text-center mt-6">
+                <span class="text-gray-500">Already have an account?</span>
+                <a href="{% url 'login' %}"
+                    class="font-bold text-indigo-600 hover:text-indigo-500 underline decoration-indigo-200 underline-offset-4 transition-all hover:decoration-indigo-500">Sign in</a>
             </div>
         </form>
     </div>
 </div>
 
 <style>
-    /* Styling Django built-in form inputs to match Tailwind expectations */
-    input[type="text"],
-    input[type="password"],
-    input[type="email"],
-    select {
-        @apply appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm;
+    /* Premium input styling - removed @apply to avoid build issues */
+    input, select {
+        box-sizing: border-box !important;
+    }
+
+    /* Target Django-voted password help lists */
+    .password-help-container ul {
+        list-style-type: none;
+        padding-left: 0;
+        margin: 0;
+    }
+    
+    .password-help-container ul li {
+        position: relative;
+        padding-left: 1.25rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .password-help-container ul li::before {
+        content: "\f00c";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        position: absolute;
+        left: 0;
+        color: #6366f1; /* indigo-500 */
+        font-size: 0.65rem;
+    }
+    
+    /* Animation for the card entrance */
+    .max-w-md {
+        animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 </style>
+
+
 {% endblock %}

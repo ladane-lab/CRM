@@ -1,43 +1,78 @@
 {% extends 'crm/base.html' %}
 
 {% block header_title %}
-{% if object %}Edit Lead: {{ object.first_name }} {{ object.last_name }}{% else %}Create New Lead{% endif %}
+<div class="flex items-center gap-3">
+    <div class="h-10 w-10 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 shadow-sm">
+        <i class="fas {% if object %}fa-user-edit{% else %}fa-user-plus{% endif %}"></i>
+    </div>
+    <span>{% if object %}Edit Lead: {{ object.first_name }}{% else %}Create New Lead{% endif %}</span>
+</div>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto">
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden p-8">
-        <form method="post" class="space-y-6">
+<div class="min-h-[80vh] flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-indigo-50/30 rounded-3xl">
+    <div class="max-w-3xl w-full space-y-8 bg-white/80 backdrop-blur-xl p-8 md:p-12 rounded-3xl shadow-2xl border border-white flex flex-col relative overflow-hidden">
+        <!-- Decorative Background Element -->
+        <div class="absolute -top-24 -right-24 w-48 h-48 bg-indigo-50 rounded-full blur-3xl opacity-50"></div>
+        <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-purple-50 rounded-full blur-3xl opacity-50"></div>
+
+        <div class="relative">
+            <h3 class="text-2xl font-bold text-gray-900 tracking-tight">Lead Information</h3>
+            <p class="text-sm text-gray-500 mt-1">Fill in the details below to {% if object %}update{% else %}register{% endif %} a potential client.</p>
+        </div>
+        
+        <form method="post" class="mt-8 space-y-6 relative">
             {% csrf_token %}
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 {% for field in form %}
-                {% if field.name == 'status' or field.name == 'source' %}
-                <div class="col-span-1 md:col-span-2 text-sm">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.help_text %}<p class="text-xs text-gray-500 mt-1">{{ field.help_text }}</p>{% endif %}
-                    {{ field.errors }}
+                <div class="{% if field.name == 'status' or field.name == 'source' %}col-span-1 md:col-span-2{% endif %} relative">
+                    <label for="{{ field.id_for_label }}" class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2 ml-1">
+                        {{ field.label }}
+                    </label>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+                            {% if 'first_name' in field.name %}
+                                <i class="far fa-user text-gray-400 group-focus-within:text-indigo-500 transition-colors"></i>
+                            {% elif 'last_name' in field.name %}
+                                <i class="fas fa-signature text-gray-400 group-focus-within:text-indigo-500 transition-colors"></i>
+                            {% elif 'email' in field.name %}
+                                <i class="far fa-envelope text-gray-400 group-focus-within:text-indigo-500 transition-colors"></i>
+                            {% elif 'phone' in field.name %}
+                                <i class="fas fa-phone-alt text-gray-400 group-focus-within:text-indigo-500 transition-colors"></i>
+                            {% elif 'status' in field.name %}
+                                <i class="fas fa-tasks text-gray-400 group-focus-within:text-indigo-500 transition-colors"></i>
+                            {% elif 'source' in field.name %}
+                                <i class="fas fa-bullhorn text-gray-400 group-focus-within:text-indigo-500 transition-colors"></i>
+                            {% else %}
+                                <i class="fas fa-edit text-gray-400 group-focus-within:text-indigo-500 transition-colors"></i>
+                            {% endif %}
+                        </div>
+                        {{ field }}
+                    </div>
+                    {% for error in field.errors %}
+                        <p class="text-xs text-red-500 mt-1.5 ml-1 font-medium flex items-center gap-1">
+                            <i class="fas fa-circle-exclamation text-[10px]"></i> {{ error }}
+                        </p>
+                    {% endfor %}
+                    {% if field.help_text and not field.errors %}
+                        <p class="text-[10px] text-gray-400 mt-1.5 ml-1 leading-tight">{{ field.help_text|safe }}</p>
+                    {% endif %}
                 </div>
-                {% else %}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.help_text %}<p class="text-xs text-gray-500 mt-1">{{ field.help_text }}</p>{% endif %}
-                    {{ field.errors }}
-                </div>
-                {% endif %}
                 {% endfor %}
             </div>
 
-            <div class="mt-8 pt-6 border-t border-gray-100 flex items-center justify-end gap-3">
+            <div class="mt-12 pt-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-end gap-4">
                 <a href="{% url 'lead-list' %}"
-                    class="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                    class="w-full sm:w-auto px-6 py-3 text-sm font-bold text-gray-500 hover:text-gray-700 transition-colors flex items-center justify-center">
                     Cancel
                 </a>
                 <button type="submit"
-                    class="px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors flex items-center gap-2">
-                    <i class="fas fa-save"></i> Save Lead
+                    class="w-full sm:w-auto group relative flex justify-center py-3.5 px-10 border border-transparent text-sm font-bold rounded-2xl text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:-translate-y-0.5 shadow-xl active:scale-95">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-save opacity-70"></i>
+                        {% if object %}Save Changes{% else %}Create Lead{% endif %}
+                    </span>
                 </button>
             </div>
         </form>
@@ -45,11 +80,39 @@
 </div>
 
 <style>
-    /* Styling for the model form */
+    /* Premium input styling */
     input[type="text"],
     input[type="email"],
-    select {
-        @apply appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm;
+    input[type="tel"],
+    select,
+    textarea {
+        display: block;
+        width: 100%;
+        padding: 0.875rem 1rem 0.875rem 2.75rem;
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        font-size: 0.875rem;
+        color: #111827;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    input:focus, select:focus, textarea:focus {
+        outline: none;
+        background-color: #ffffff;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    /* Animation for the card entrance */
+    .max-w-3xl {
+        animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 </style>
 {% endblock %}

@@ -27,4 +27,10 @@ urlpatterns = [
     path('opportunities/<int:pk>/', views.OpportunityDetailView.as_view(), name='opportunity-detail'),
     path('opportunities/<int:pk>/update/', views.OpportunityUpdateView.as_view(), name='opportunity-update'),
     path('opportunities/<int:pk>/delete/', views.OpportunityDeleteView.as_view(), name='opportunity-delete'),
+
+    # Integration URLs
+    path('integrations/', views.IntegrationListView.as_view(), name='integration-list'),
+    path('integrations/<int:pk>/configure/', views.IntegrationUpdateView.as_view(), name='integration-update'),
+    path('integrations/<int:pk>/test/', views.test_integration_view, name='integration-test'),
+    path('opportunities/<int:pk>/export/', views.OpportunityExportView.as_view(), name='opportunity-export'),
 ]

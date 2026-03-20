@@ -2,7 +2,15 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from .forms import SignUpForm
+from .forms import SignUpForm, LeadForm, AccountForm, ContactForm, OpportunityForm, IntegrationConfigForm
+from .models import Lead, Account, Contact, Opportunity, IntegrationConfig, Task
+from django.db.models import Sum, Count, Q
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib import messages
+from .utils import send_slack_message
 
 def signup_view(request):
     if request.user.is_authenticated:
@@ -43,8 +51,6 @@ def logout_view(request):
     logout(request)
     return redirect('login')
 
-from django.db.models import Sum, Count
-
 @login_required(login_url='login')
 def dashboard_view(request):
     # Calculate metrics
@@ -80,6 +86,14 @@ def dashboard_view(request):
     stage_labels = [s.capitalize() for s in stages]
     stage_values = [pipeline_data[s] for s in stages]
 
+    # 2. Recent Activity
+    if user_role == 'admin':
+        recent_leads = Lead.objects.all().order_by('-created_at')[:5]
+        recent_opps = Opportunity.objects.all().order_by('-created_at')[:5]
+    else:
+        recent_leads = Lead.objects.filter(assigned_to=request.user).order_by('-created_at')[:5]
+        recent_opps = Opportunity.objects.filter(assigned_to=request.user).order_by('-created_at')[:5]
+
     context = {
         'total_contacts': contacts_count,
         'active_leads': leads_count,
@@ -87,16 +101,10 @@ def dashboard_view(request):
         'revenue_pipeline': revenue,
         'stage_labels': stage_labels,
         'stage_values': stage_values,
+        'recent_leads': recent_leads,
+        'recent_opportunities': recent_opps,
     }
     return render(request, 'crm/dashboard.html', context)
-
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
-from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Lead, Account, Contact, Opportunity
-from .forms import LeadForm, AccountForm, ContactForm, OpportunityForm
-
-from django.db.models import Q
 
 # --- Lead Views ---
 class LeadListView(LoginRequiredMixin, ListView):
@@ -130,23 +138,25 @@ class LeadDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'lead'
     login_url = 'login'
 
-class LeadCreateView(LoginRequiredMixin, CreateView):
+class LeadCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Lead
     form_class = LeadForm
     template_name = 'crm/lead_form.html'
     success_url = reverse_lazy('lead-list')
     login_url = 'login'
+    success_message = "Lead '%(first_name)s %(last_name)s' was created successfully."
 
     def form_valid(self, form):
         form.instance.assigned_to = self.request.user
         return super().form_valid(form)
 
-class LeadUpdateView(LoginRequiredMixin, UpdateView):
+class LeadUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Lead
     form_class = LeadForm
     template_name = 'crm/lead_form.html'
     success_url = reverse_lazy('lead-list')
     login_url = 'login'
+    success_message = "Lead '%(first_name)s %(last_name)s' was updated successfully."
 
 class LeadDeleteView(LoginRequiredMixin, DeleteView):
     model = Lead
@@ -163,7 +173,16 @@ class AccountListView(LoginRequiredMixin, ListView):
     paginate_by = 10
     
     def get_queryset(self):
-        return Account.objects.all().order_by('-created_at')
+        query = self.request.GET.get('q', '')
+        queryset = Account.objects.all()
+            
+        if query:
+            queryset = queryset.filter(
+                Q(name__icontains=query) |
+                Q(industry__icontains=query)
+            )
+            
+        return queryset.order_by('-created_at')
 
 class AccountDetailView(LoginRequiredMixin, DetailView):
     model = Account
@@ -171,19 +190,21 @@ class AccountDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'account'
     login_url = 'login'
 
-class AccountCreateView(LoginRequiredMixin, CreateView):
+class AccountCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Account
     form_class = AccountForm
     template_name = 'crm/account_form.html'
     success_url = reverse_lazy('account-list')
     login_url = 'login'
+    success_message = "Account '%(name)s' was created successfully."
 
-class AccountUpdateView(LoginRequiredMixin, UpdateView):
+class AccountUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Account
     form_class = AccountForm
     template_name = 'crm/account_form.html'
     success_url = reverse_lazy('account-list')
     login_url = 'login'
+    success_message = "Account '%(name)s' was updated successfully."
 
 class AccountDeleteView(LoginRequiredMixin, DeleteView):
     model = Account
@@ -228,26 +249,82 @@ class OpportunityDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'opportunity'
     login_url = 'login'
 
-class OpportunityCreateView(LoginRequiredMixin, CreateView):
+class OpportunityCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Opportunity
     form_class = OpportunityForm
     template_name = 'crm/opportunity_form.html'
     success_url = reverse_lazy('opportunity-list')
     login_url = 'login'
+    success_message = "Opportunity '%(name)s' was created successfully."
 
     def form_valid(self, form):
         form.instance.assigned_to = self.request.user
         return super().form_valid(form)
 
-class OpportunityUpdateView(LoginRequiredMixin, UpdateView):
+class OpportunityUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Opportunity
     form_class = OpportunityForm
     template_name = 'crm/opportunity_form.html'
     success_url = reverse_lazy('opportunity-list')
     login_url = 'login'
+    success_message = "Opportunity '%(name)s' was updated successfully."
 
 class OpportunityDeleteView(LoginRequiredMixin, DeleteView):
     model = Opportunity
     template_name = 'crm/opportunity_confirm_delete.html'
     success_url = reverse_lazy('opportunity-list')
     login_url = 'login'
+
+# --- Integration Views ---
+class IntegrationListView(LoginRequiredMixin, ListView):
+    model = IntegrationConfig
+    template_name = 'crm/integration_list.html'
+    context_object_name = 'integrations'
+    login_url = 'login'
+
+    def get_queryset(self):
+        # Ensure default configs exist for display
+        for service, label in IntegrationConfig.SERVICE_CHOICES:
+            IntegrationConfig.objects.get_or_create(service=service)
+        return IntegrationConfig.objects.all()
+
+class OpportunityExportView(LoginRequiredMixin, DetailView):
+    model = Opportunity
+    login_url = 'login'
+
+    def get(self, request, *args, **kwargs):
+        opportunity = self.get_object()
+        from .utils import export_opportunity_to_json
+        from django.http import HttpResponse
+        
+        json_data = export_opportunity_to_json(opportunity)
+        response = HttpResponse(json_data, content_type='application/json')
+        response['Content-Disposition'] = f'attachment; filename="opportunity_{opportunity.id}_export.json"'
+        return response
+
+class IntegrationUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = IntegrationConfig
+    form_class = IntegrationConfigForm
+    template_name = 'crm/integration_form.html'
+    success_url = reverse_lazy('integration-list')
+    login_url = 'login'
+    success_message = "Integration settings updated successfully."
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['service_name'] = self.object.get_service_display()
+        return context
+
+@login_required(login_url='login')
+def test_integration_view(request, pk):
+    config = IntegrationConfig.objects.get(pk=pk)
+    if config.service == 'slack':
+        success = send_slack_message(f"🚀 Test connection from CRM Pro for Service: {config.get_service_display()}")
+        if success:
+            messages.success(request, f"Successfully sent test message to {config.get_service_display()}!")
+        else:
+            messages.error(request, f"Failed to send test message to {config.get_service_display()}. Check your webhook URL.")
+    else:
+        messages.info(request, f"Test connection for {config.get_service_display()} is not yet implemented.")
+        
+    return redirect('integration-update', pk=pk)

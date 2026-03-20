@@ -8,10 +8,34 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+
+        :root {
+            --sidebar-bg: #0f172a; /* slate-900 */
+            --sidebar-hover: #1e293b; /* slate-800 */
+            --sidebar-active: rgba(99, 102, 241, 0.1);
+            --accent-color: #6366f1;
+        }
 
         body {
             font-family: 'Inter', sans-serif;
+            letter-spacing: -0.01em;
+        }
+        
+        h1, h2, h3, h4, .font-outfit {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .sidebar-item-active {
+            background: var(--sidebar-active);
+            border-left: 4px solid var(--accent-color);
+            color: white;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
     </style>
 </head>
@@ -20,36 +44,62 @@
     {% if user.is_authenticated %}
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
-        <aside class="w-64 bg-indigo-800 text-white flex flex-col transition-all duration-300">
-            <div class="h-16 flex items-center justify-center border-b border-indigo-700">
-                <h1 class="text-2xl font-bold tracking-wider relative flex items-center gap-2">
-                    <i class="fas fa-chart-pie text-indigo-300"></i> CRM Pro
+        <aside class="w-64 bg-[#0f172a] text-slate-300 flex flex-col transition-all duration-300 shadow-2xl z-20">
+            <div class="h-20 flex items-center px-8 border-b border-slate-800/50">
+                <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-3">
+                    <div class="bg-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-500/20">
+                        <i class="fas fa-chart-pie text-white text-lg"></i>
+                    </div>
+                    <span>CRM <span class="text-indigo-400">Pro</span></span>
                 </h1>
             </div>
-            <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+            <nav class="flex-1 px-4 py-8 space-y-1.5 overflow-y-auto custom-scrollbar">
                 <a href="{% url 'dashboard' %}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg bg-indigo-900 text-white transition-colors">
-                    <i class="fas fa-home w-5"></i> Dashboard
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group {% if request.resolver_match.url_name == 'dashboard' %}sidebar-item-active text-white{% else %}hover:bg-slate-800/50 hover:text-white{% endif %}">
+                    <i class="fas fa-home w-5 text-lg {% if request.resolver_match.url_name == 'dashboard' %}text-indigo-400{% else %}text-slate-500 group-hover:text-indigo-400{% endif %}"></i>
+                    <span class="font-medium">Dashboard</span>
                 </a>
+                
+                <div class="pt-4 pb-2 px-4 uppercase text-[10px] font-bold tracking-widest text-slate-500">Sales Hub</div>
+                
                 <a href="{% url 'account-list' %}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-indigo-700 text-indigo-100 transition-colors">
-                    <i class="far fa-building w-5"></i> Accounts
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group {% if 'account' in request.resolver_match.url_name %}sidebar-item-active text-white{% else %}hover:bg-slate-800/50 hover:text-white{% endif %}">
+                    <i class="far fa-building w-5 text-lg {% if 'account' in request.resolver_match.url_name %}text-indigo-400{% else %}text-slate-500 group-hover:text-indigo-400{% endif %}"></i>
+                    <span class="font-medium">Accounts</span>
                 </a>
                 <a href="{% url 'lead-list' %}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-indigo-700 text-indigo-100 transition-colors">
-                    <i class="fas fa-bullseye w-5"></i> Leads
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group {% if 'lead' in request.resolver_match.url_name %}sidebar-item-active text-white{% else %}hover:bg-slate-800/50 hover:text-white{% endif %}">
+                    <i class="fas fa-bullseye w-5 text-lg {% if 'lead' in request.resolver_match.url_name %}text-indigo-400{% else %}text-slate-500 group-hover:text-indigo-400{% endif %}"></i>
+                    <span class="font-medium">Leads</span>
                 </a>
                 <a href="{% url 'opportunity-list' %}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-indigo-700 text-indigo-100 transition-colors">
-                    <i class="fas fa-handshake w-5"></i> Opportunities
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group {% if 'opportunity' in request.resolver_match.url_name %}sidebar-item-active text-white{% else %}hover:bg-slate-800/50 hover:text-white{% endif %}">
+                    <i class="fas fa-handshake w-5 text-lg {% if 'opportunity' in request.resolver_match.url_name %}text-indigo-400{% else %}text-slate-500 group-hover:text-indigo-400{% endif %}"></i>
+                    <span class="font-medium">Opportunities</span>
+                </a>
+                
+                <div class="pt-4 pb-2 px-4 uppercase text-[10px] font-bold tracking-widest text-slate-500">System</div>
+                
+                <a href="{% url 'integration-list' %}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group {% if 'integration' in request.resolver_match.url_name %}sidebar-item-active text-white{% else %}hover:bg-slate-800/50 hover:text-white{% endif %}">
+                    <i class="fas fa-plug w-5 text-lg {% if 'integration' in request.resolver_match.url_name %}text-indigo-400{% else %}text-slate-500 group-hover:text-indigo-400{% endif %}"></i>
+                    <span class="font-medium">Integrations</span>
                 </a>
             </nav>
-            <div class="p-4 border-t border-indigo-700 text-sm flex items-center justify-between">
-                <span class="truncate">{{ user.username }}</span>
-                <form action="{% url 'logout' %}" method="post" class="inline">
+            <div class="p-6 border-t border-slate-800/50 bg-slate-900/50 mt-auto">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="h-10 w-10 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold uppercase">
+                        {{ user.username|slice:":1" }}
+                    </div>
+                    <div class="flex-1 truncate">
+                        <p class="text-sm font-bold text-white leading-none">{{ user.username }}</p>
+                        <p class="text-[10px] text-slate-500 mt-1 capitalize">{{ user.role }}</p>
+                    </div>
+                </div>
+                <form action="{% url 'logout' %}" method="post" class="w-full">
                     {% csrf_token %}
-                    <button type="submit" class="text-indigo-300 hover:text-white transition-colors" title="Logout">
-                        <i class="fas fa-sign-out-alt"></i>
+                    <button type="submit" class="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-red-500/10 hover:text-red-400 transition-all border border-slate-700">
+                        <i class="fas fa-sign-out-alt"></i> Logout
                     </button>
                 </form>
             </div>
@@ -58,13 +108,33 @@
         <!-- Main Content -->
         <main class="flex-1 flex flex-col h-screen overflow-hidden">
             <!-- Header -->
-            <header
-                class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 z-10 shadow-sm">
-                <h2 class="text-xl font-semibold text-gray-800">{% block header_title %}Dashboard{% endblock %}</h2>
+            <header class="h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-10 z-10 sticky top-0">
+                <h2 class="text-2xl font-bold text-slate-800 tracking-tight">{% block header_title %}Dashboard{% endblock %}</h2>
             </header>
 
             <!-- Page Content -->
             <div class="flex-1 overflow-y-auto p-8 bg-gray-50">
+                {% if messages %}
+                <div class="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 space-y-3 pointer-events-none">
+                    {% for message in messages %}
+                    <div class="pointer-events-auto p-4 rounded-2xl shadow-2xl border flex items-center gap-4 animate-in fade-in slide-in-from-top-8 duration-500
+                        {% if message.tags == 'success' %}bg-white border-green-100 text-green-800{% elif message.tags == 'error' %}bg-white border-red-100 text-red-800{% else %}bg-white border-blue-100 text-blue-800{% endif %}">
+                        <div class="h-10 w-10 rounded-full flex items-center justify-center shrink-0
+                            {% if message.tags == 'success' %}bg-green-50 text-green-600{% elif message.tags == 'error' %}bg-red-50 text-red-600{% else %}bg-blue-50 text-blue-600{% endif %}">
+                            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %} text-lg"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-xs font-bold uppercase tracking-wider opacity-50 mb-0.5">{{ message.tags|default:"Notification" }}</p>
+                            <p class="text-sm font-bold text-slate-800">{{ message }}</p>
+                        </div>
+                        <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600 transition-colors p-1">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
                 {% block content %}
                 {% endblock %}
             </div>

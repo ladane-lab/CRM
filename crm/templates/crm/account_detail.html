@@ -3,85 +3,111 @@
 {% block header_title %}Account Details{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto space-y-6">
-    <!-- Account Info Card -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div
-            class="px-6 py-5 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gray-50">
-            <div class="flex items-center gap-3">
-                <div
-                    class="h-12 w-12 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl">
+<div class="max-w-5xl mx-auto space-y-10">
+    <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
+        <!-- Header Section -->
+        <div class="px-10 py-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 bg-white shrink-0 border-b border-slate-50">
+            <div class="flex items-center gap-6">
+                <div class="h-16 w-16 rounded-3xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl shadow-inner">
                     <i class="far fa-building"></i>
                 </div>
                 <div>
-                    <h3 class="text-2xl font-bold text-gray-900">{{ account.name }}</h3>
-                    <p class="text-sm text-gray-500 mt-1">
-                        {% if account.industry %}{{ account.industry }}{% else %}No industry specified{% endif %}
-                    </p>
+                    <h3 class="text-3xl font-bold text-slate-900 font-outfit mb-1">{{ account.name }}</h3>
+                    <div class="flex flex-wrap items-center gap-4 text-sm font-bold text-slate-400 uppercase tracking-tighter">
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-tag text-indigo-400"></i>
+                            {% if account.industry %}{{ account.industry }}{% else %}No industry specified{% endif %}
+                        </span>
+                        {% if account.website %}
+                        <span class="h-1 w-1 rounded-full bg-slate-300"></span>
+                        <a href="{{ account.website }}" target="_blank" class="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 transition-colors">
+                            <i class="fas fa-external-link-alt text-[10px]"></i> {{ account.website }}
+                        </a>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
-            <div class="flex gap-2">
+            <div class="flex gap-3">
                 <a href="{% url 'account-update' account.pk %}"
-                    class="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm">
-                    <i class="fas fa-edit mr-1"></i> Edit
+                    class="h-11 px-6 bg-slate-900 text-white rounded-2xl text-sm font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 flex items-center gap-2">
+                    <i class="fas fa-edit text-xs"></i> Edit Account
                 </a>
                 <a href="{% url 'account-delete' account.pk %}"
-                    class="px-3 py-1.5 bg-red-50 text-red-700 border border-red-100 rounded-md text-sm font-medium hover:bg-red-100 transition-colors">
-                    <i class="fas fa-trash-alt mr-1"></i> Delete
+                    class="h-11 px-6 bg-red-50 text-red-600 rounded-2xl text-sm font-bold hover:bg-red-100 transition-all flex items-center gap-2">
+                    <i class="fas fa-trash-alt text-xs"></i>
                 </a>
             </div>
         </div>
 
-        <div class="p-6">
-            <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
-                <div class="sm:col-span-1">
-                    <dt class="text-sm font-medium text-gray-500">Website</dt>
-                    <dd class="mt-1 text-sm text-gray-900">
-                        {% if account.website %}
-                        <a href="{{ account.website }}" target="_blank" class="text-indigo-600 hover:underline">{{
-                            account.website }}</a>
-                        {% else %}
-                        -
-                        {% endif %}
+        <!-- Info Grid -->
+        <div class="px-10 py-10 bg-slate-50/50">
+            <dl class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div class="space-y-1.5">
+                    <dt class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Industry Classification</dt>
+                    <dd class="text-lg font-bold text-slate-700 capitalize">
+                        {{ account.industry|default:"General Industry" }}
                     </dd>
                 </div>
-                <div class="sm:col-span-1">
-                    <dt class="text-sm font-medium text-gray-500">Created At</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ account.created_at|date:"M d, Y" }}</dd>
+                <div class="space-y-1.5">
+                    <dt class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Creation Timestamp</dt>
+                    <dd class="text-lg font-bold text-slate-700 flex items-center gap-3">
+                        <div class="h-10 w-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center shadow-sm">
+                            <i class="far fa-clock text-indigo-500"></i>
+                        </div>
+                        {{ account.created_at|date:"d M, Y" }}
+                    </dd>
                 </div>
-                <div class="sm:col-span-2">
-                    <dt class="text-sm font-medium text-gray-500">Address</dt>
-                    <dd class="mt-1 text-sm text-gray-900 whitespace-pre-line">{{ account.address|default:"-" }}</dd>
+                <div class="sm:col-span-2 border-t border-slate-200 pt-8 space-y-1.5">
+                    <dt class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Headquarters Address</dt>
+                    <dd class="text-lg font-bold text-slate-700 flex items-start gap-3 whitespace-pre-line leading-relaxed">
+                        <i class="fas fa-map-marker-alt text-slate-300 mt-1.5"></i> {{ account.address|default:"Not specified" }}
+                    </dd>
                 </div>
             </dl>
         </div>
     </div>
 
-    <!-- Contacts Section (Preview for Future) -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-gray-800">Associated Contacts</h3>
-            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">{{ account.contacts.count }}</span>
+    <!-- Related Contacts -->
+    <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
+        <div class="px-10 py-6 border-b border-slate-50 flex items-center justify-between bg-white">
+            <h3 class="text-xl font-bold text-slate-800 font-outfit flex items-center gap-3">
+                <div class="h-8 w-8 rounded-lg bg-sky-50 text-sky-500 flex items-center justify-center text-sm shadow-sm">
+                    <i class="fas fa-users-cog"></i>
+                </div>
+                Key Personnel
+            </h3>
+            <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-slate-100 text-slate-500 border border-slate-200">
+                {{ account.contacts.count }} Total
+            </span>
         </div>
-        <div class="p-0">
-            {% if account.contacts.all %}
-            <ul class="divide-y divide-gray-100">
+        <div class="p-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {% for contact in account.contacts.all %}
-                <li class="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
-                    <div>
-                        <p class="text-sm font-medium text-gray-900">{{ contact.first_name }} {{ contact.last_name }}
-                        </p>
-                        <p class="text-xs text-gray-500">{{ contact.email }} | {{ contact.phone|default:"-" }}</p>
+                <div class="flex items-center gap-5 p-6 rounded-3xl border border-slate-50 bg-slate-50/30 hover:bg-white hover:shadow-xl hover:shadow-slate-200/50 transition-all group">
+                    <div class="h-14 w-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                        <i class="fas fa-user-circle"></i>
                     </div>
-                </li>
+                    <div>
+                        <p class="text-base font-bold text-slate-700 mb-0.5 group-hover:text-indigo-600 transition-colors">{{ contact.first_name }} {{ contact.last_name }}</p>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-tighter">{{ contact.email }}</p>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-span-2 py-10 text-center">
+                    <div class="h-16 w-16 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                        <i class="fas fa-user-slash text-slate-100 text-2xl"></i>
+                    </div>
+                    <p class="text-sm text-slate-300 italic font-medium">No contacts associated with this account repository.</p>
+                </div>
                 {% endfor %}
-            </ul>
-            {% else %}
-            <div class="p-6 text-center text-gray-500 text-sm">
-                No contacts associated with this account yet.
             </div>
-            {% endif %}
         </div>
+    </div>
+
+    <div class="px-4">
+        <a href="{% url 'account-list' %}" class="inline-flex items-center gap-2 text-sm font-bold text-indigo-600 hover:text-indigo-800 transition-colors uppercase tracking-widest">
+            <i class="fas fa-arrow-left text-xs"></i> Back to Ledger
+        </a>
     </div>
 </div>
 {% endblock %}

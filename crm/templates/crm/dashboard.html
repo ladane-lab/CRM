@@ -1,4 +1,5 @@
 {% extends 'crm/base.html' %}
+{% load currency_tags %}
 
 {% block header_title %}
 Welcome back, {{ user.username }}
@@ -7,131 +8,234 @@ Welcome back, {{ user.username }}
 {% block content %}
 <div class="max-w-7xl mx-auto">
     <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
         <!-- Stat Card 1 -->
-        <div
-            class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex items-center hover:shadow-md transition-shadow">
-            <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+        <div class="group bg-white rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 p-7 border border-gray-100 transition-all duration-300 flex flex-col gap-4 relative overflow-hidden">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-50/30 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+            <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center transition-colors group-hover:bg-blue-600 group-hover:text-white">
                 <i class="fas fa-users text-xl"></i>
             </div>
             <div>
-                <p class="text-sm font-medium text-gray-500">Total Contacts</p>
-                <p class="text-2xl font-bold text-gray-900">{{ total_contacts }}</p>
+                <p class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-1">Total Contacts</p>
+                <div class="flex items-baseline gap-2">
+                    <p class="text-3xl font-bold text-slate-900 font-outfit">{{ total_contacts }}</p>
+                    <span class="text-[10px] text-green-500 font-bold bg-green-50 px-1.5 py-0.5 rounded">+12%</span>
+                </div>
             </div>
         </div>
 
         <!-- Stat Card 2 -->
-        <div
-            class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex items-center hover:shadow-md transition-shadow">
-            <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
+        <div class="group bg-white rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 p-7 border border-gray-100 transition-all duration-300 flex flex-col gap-4 relative overflow-hidden">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-yellow-50/30 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+            <div class="w-14 h-14 rounded-2xl bg-yellow-50 text-yellow-600 flex items-center justify-center transition-colors group-hover:bg-yellow-600 group-hover:text-white">
                 <i class="fas fa-bullseye text-xl"></i>
             </div>
             <div>
-                <p class="text-sm font-medium text-gray-500">Active Leads</p>
-                <p class="text-2xl font-bold text-gray-900">{{ active_leads }}</p>
+                <p class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-1">Active Leads</p>
+                <p class="text-3xl font-bold text-slate-900 font-outfit">{{ active_leads }}</p>
             </div>
         </div>
 
         <!-- Stat Card 3 -->
-        <div
-            class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex items-center hover:shadow-md transition-shadow">
-            <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+        <div class="group bg-white rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 p-7 border border-gray-100 transition-all duration-300 flex flex-col gap-4 relative overflow-hidden">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-green-50/30 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+            <div class="w-14 h-14 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center transition-colors group-hover:bg-green-600 group-hover:text-white">
                 <i class="fas fa-chart-line text-xl"></i>
             </div>
             <div>
-                <p class="text-sm font-medium text-gray-500">Opportunities Won</p>
-                <p class="text-2xl font-bold text-gray-900">{{ opportunities_won }}</p>
+                <p class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-1">Opportunities Won</p>
+                <p class="text-3xl font-bold text-slate-900 font-outfit">{{ opportunities_won }}</p>
             </div>
         </div>
 
         <!-- Stat Card 4 -->
-        <div
-            class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex items-center hover:shadow-md transition-shadow">
-            <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
-                <i class="fas fa-dollar-sign text-xl py-0.5 px-1.5"></i>
+        <div class="group bg-white rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 p-7 border border-gray-100 transition-all duration-300 flex flex-col gap-4 relative overflow-hidden">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-indigo-50/30 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+            <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center transition-colors group-hover:bg-indigo-600 group-hover:text-white">
+                <i class="fas fa-wallet text-xl"></i>
             </div>
             <div>
-                <p class="text-sm font-medium text-gray-500">Won Revenue</p>
-                <p class="text-2xl font-bold text-gray-900">${{ revenue_pipeline }}</p>
+                <p class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-1">Won Revenue</p>
+                <p class="text-[22px] font-bold text-slate-900 font-outfit leading-tight">{{ revenue_pipeline|indian_currency }}</p>
             </div>
         </div>
     </div>
 
-    <!-- Charts Section -->
-    <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Pipeline by Stage</h3>
-            <div class="relative h-64 w-full">
+    <!-- Charts & Recent Activity Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+        <!-- Chart -->
+        <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm p-8 border border-gray-100">
+            <div class="flex items-center justify-between mb-8">
+                <h3 class="text-xl font-bold text-slate-800 font-outfit">Pipeline Forecast</h3>
+                <div class="flex gap-2">
+                    <button class="px-3 py-1 text-xs font-bold bg-indigo-50 text-indigo-600 rounded-lg">Real-time</button>
+                    <button class="px-3 py-1 text-xs font-bold text-slate-400 hover:text-slate-600">Weekly</button>
+                </div>
+            </div>
+            <div class="relative h-72 w-full">
                 <canvas id="pipelineChart"></canvas>
+                {{ stage_labels|json_script:"stage-labels-data" }}
+                {{ stage_values|json_script:"stage-values-data" }}
             </div>
         </div>
 
-        <div
-            class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex flex-col items-center justify-center text-center">
-            <div class="w-16 h-16 bg-indigo-50 text-indigo-500 rounded-full flex items-center justify-center mb-4">
-                <i class="fas fa-rocket text-2xl"></i>
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 flex flex-col">
+            <div class="px-8 py-6 border-b border-gray-100">
+                <h3 class="text-xl font-bold text-slate-800 font-outfit">Quick Actions</h3>
             </div>
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">Ready to Grow</h3>
-            <p class="text-sm text-gray-500 max-w-sm mb-6">Your CRM is set up and configured. Start adding tasks and
-                logging activities to close more deals.</p>
-            <a href="{% url 'opportunity-create' %}"
-                class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm">
-                Add New Opportunity
-            </a>
+            <div class="p-6 space-y-4 flex-1">
+                <a href="{% url 'lead-create' %}" class="w-full h-16 flex items-center justify-between px-6 rounded-2xl bg-slate-50 border border-transparent hover:border-indigo-100 hover:bg-white hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300 group">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-white group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white p-3 rounded-xl shadow-sm transition-all duration-300">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <span class="font-bold text-slate-700 tracking-tight">Add New Lead</span>
+                    </div>
+                </a>
+                <a href="{% url 'opportunity-create' %}" class="w-full h-16 flex items-center justify-between px-6 rounded-2xl bg-slate-50 border border-transparent hover:border-green-100 hover:bg-white hover:shadow-lg hover:shadow-green-500/5 transition-all duration-300 group">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-white group-hover:bg-green-600 text-green-600 group-hover:text-white p-3 rounded-xl shadow-sm transition-all duration-300">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <span class="font-bold text-slate-700 tracking-tight">New Opportunity</span>
+                    </div>
+                </a>
+                <a href="{% url 'integration-list' %}" class="w-full h-16 flex items-center justify-between px-6 rounded-2xl bg-slate-50 border border-transparent hover:border-purple-100 hover:bg-white hover:shadow-lg hover:shadow-purple-500/5 transition-all duration-300 group">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-white group-hover:bg-purple-600 text-purple-600 group-hover:text-white p-3 rounded-xl shadow-sm transition-all duration-300">
+                            <i class="fas fa-plug"></i>
+                        </div>
+                        <span class="font-bold text-slate-700 tracking-tight">Manage Integrations</span>
+                    </div>
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- Main Content Area -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Left Column: Recent Activity -->
-        <div class="lg:col-span-2">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                    <h3 class="text-lg font-semibold text-gray-800">Recent Leads</h3>
-                    <a href="#" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">View all</a>
-                </div>
-                <div class="p-6 text-center text-gray-500">
-                    <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
-                    <p>No recent leads to display.</p>
-                    <button
-                        class="mt-4 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg text-sm font-medium hover:bg-indigo-100 transition-colors">
-                        Add New Lead
-                    </button>
-                </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-10">
+        <!-- Recent Leads -->
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-white">
+                <h3 class="text-xl font-bold text-slate-800 font-outfit">Recent Leads</h3>
+                <a href="{% url 'lead-list' %}" class="text-sm text-indigo-600 hover:text-indigo-800 font-bold bg-indigo-50 px-4 py-1.5 rounded-full transition-all">View all</a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50/50">
+                        <tr>
+                            <th class="px-8 py-4">Name</th>
+                            <th class="px-8 py-4">Status</th>
+                            <th class="px-8 py-4 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        {% for lead in recent_leads %}
+                        <tr class="hover:bg-slate-50/50 transition-colors group">
+                            <td class="px-8 py-5">
+                                <p class="text-sm font-bold text-slate-700">{{ lead.first_name }} {{ lead.last_name }}</p>
+                                <p class="text-[11px] text-slate-400">{{ lead.email }}</p>
+                            </td>
+                            <td class="px-8 py-5">
+                                <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight
+                                {% if lead.status == 'new' %}bg-blue-100 text-blue-600{% elif lead.status == 'contacted' %}bg-purple-100 text-purple-600{% elif lead.status == 'qualified' %}bg-green-100 text-green-600{% else %}bg-red-100 text-red-600{% endif %}">
+                                    {{ lead.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="px-8 py-5 text-right">
+                                <a href="{% url 'lead-detail' lead.pk %}" class="h-8 w-8 inline-flex items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all"><i class="fas fa-eye text-xs"></i></a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="px-8 py-12 text-center text-slate-400 italic font-medium">No recent leads found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- Right Column: Quick Actions -->
-        <div>
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-                <div class="px-6 py-4 border-b border-gray-100">
-                    <h3 class="text-lg font-semibold text-gray-800">Quick Actions</h3>
-                </div>
-                <div class="p-4 space-y-3">
-                    <button
-                        class="w-full flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors text-left">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-indigo-100 text-indigo-600 p-2 rounded-lg">
-                                <i class="fas fa-user-plus"></i>
-                            </div>
-                            <span class="font-medium text-gray-700">Add Contact</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
-                    </button>
-
-                    <button
-                        class="w-full flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors text-left">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-green-100 text-green-600 p-2 rounded-lg">
-                                <i class="fas fa-plus"></i>
-                            </div>
-                            <span class="font-medium text-gray-700">New Opportunity</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
-                    </button>
-                </div>
+        <!-- Recent Opportunities -->
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-white">
+                <h3 class="text-xl font-bold text-slate-800 font-outfit">Recent Deals</h3>
+                <a href="{% url 'opportunity-list' %}" class="text-sm text-green-600 hover:text-green-800 font-bold bg-green-50 px-4 py-1.5 rounded-full transition-all">View all</a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50/50">
+                        <tr>
+                            <th class="px-8 py-4">Deal</th>
+                            <th class="px-8 py-4 text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        {% for opp in recent_opportunities %}
+                        <tr class="hover:bg-slate-50/50 transition-colors">
+                            <td class="px-8 py-5 font-bold text-slate-700 text-sm">{{ opp.name }}</td>
+                            <td class="px-8 py-5 text-right">
+                                <span class="font-outfit font-bold text-slate-900">{{ opp.amount|default:"0"|indian_currency }}</span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2" class="px-8 py-12 text-center text-slate-400 italic font-medium">No active deals found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Chart.js Script (Free Analytics) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('pipelineChart');
+        if (ctx) {
+            const labels = JSON.parse(document.getElementById('stage-labels-data').textContent);
+            const values = JSON.parse(document.getElementById('stage-values-data').textContent);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Deals Count',
+                        data: values,
+                        backgroundColor: 'rgba(99, 102, 241, 0.4)',
+                        borderColor: 'rgba(99, 102, 241, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                precision: 0
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}
