@@ -78,3 +78,41 @@ class CRMViewTests(TestCase):
         response = self.client.get(reverse('lead-list'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'crm/lead_list.html')
+
+class CRMWorkflowTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testadmin', password='password123', role='admin')
+
+    def test_lead_to_opportunity_flow(self):
+        # 1. Create a lead
+        lead = Lead.objects.create(
+            first_name='Peter',
+            last_name='Parker',
+            email='peter@dailybugle.com',
+            status='new',
+            assigned_to=self.user
+        )
+        
+        # 2. Qualify the lead
+        lead.status = 'qualified'
+        lead.save()
+        
+        # 3. Verify Account creation
+        account = Account.objects.get(name='Parker Corp')
+        self.assertIsNotNone(account)
+        
+        # 4. Verify Contact creation
+        contact = Contact.objects.get(email='peter@dailybugle.com')
+        self.assertEqual(contact.account, account)
+        
+        # 5. Verify Opportunity creation
+        opp = Opportunity.objects.get(contact=contact, account=account)
+        self.assertEqual(opp.stage, 'prospecting')
+        
+        # 6. Close the Opportunity (Won)
+        opp.stage = 'won'
+        opp.save()
+        
+        # 7. Verify Task creation (Signal)
+        task = Task.objects.get(opportunity=opp, title="Kickoff Meeting")
+        self.assertIsNotNone(task)
